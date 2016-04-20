@@ -25,13 +25,15 @@ public class NodeWindow : EditorWindow {
 
 		EditorGUILayout.BeginHorizontal();
 		EditorGUILayout.PrefixLabel("Node Count");
-		_nodeCount = EditorGUILayout.IntSlider(_nodeCount, 2, 100);
+		_nodeCount = EditorGUILayout.IntSlider(_nodeCount, 2, 3000);
 		EditorGUILayout.EndHorizontal();
 
 		EditorGUILayout.BeginHorizontal();
 		EditorGUILayout.PrefixLabel("Node Layer Count");
 		_nodeLayerCount = EditorGUILayout.IntSlider(_nodeLayerCount, 1, _nodeCount / 2);
 		EditorGUILayout.EndHorizontal();
+
+		EditorGUILayout.LabelField("Nodes per layer			" + _nodeCount / _nodeLayerCount);
 
 		EditorGUILayout.BeginHorizontal();
 		EditorGUILayout.PrefixLabel("Node Layer Height");
@@ -50,10 +52,10 @@ public class NodeWindow : EditorWindow {
 			_nodes = new List<GameObject>();
 			_nodeCreationPos = new List<Vector3>();
 			for (int j = 0; j < _nodeLayerCount; j++) {
-				for (int i = 0; i < _nodeCount; i++) {
-					Vector3 nodePos = Vector3.forward + (Vector3.up * j * _layerHeight);
+				for (int i = 0; i < _nodeCount / _nodeLayerCount; i++) {
+					Vector3 nodePos = Vector3.forward + (Vector3.up * j);
 					if (i > 0)
-						nodePos = Quaternion.AngleAxis(360f / (_nodeCount /*/ _nodeLayers*/) * i, Vector3.up) * nodePos;
+						nodePos = Quaternion.AngleAxis(360f / (_nodeCount / _nodeLayerCount) * i, Vector3.up) * nodePos;
 					GameObject nodeIns = (GameObject)Instantiate(node, nodePos, Quaternion.identity);
 					nodeIns.name = "Node";
 					nodeIns.transform.parent = _lastSpawnedNodeHolder.transform;
