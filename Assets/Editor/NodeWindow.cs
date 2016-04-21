@@ -25,7 +25,7 @@ public class NodeWindow : EditorWindow {
 
 		EditorGUILayout.BeginHorizontal();
 		EditorGUILayout.PrefixLabel("Node Count");
-		_nodeCount = EditorGUILayout.IntSlider(_nodeCount, 2, 3000);
+		_nodeCount = EditorGUILayout.IntSlider(_nodeCount, 2, 10000);
 		EditorGUILayout.EndHorizontal();
 
 		EditorGUILayout.BeginHorizontal();
@@ -33,11 +33,11 @@ public class NodeWindow : EditorWindow {
 		_nodeLayerCount = EditorGUILayout.IntSlider(_nodeLayerCount, 1, _nodeCount / 2);
 		EditorGUILayout.EndHorizontal();
 
-		EditorGUILayout.LabelField("Nodes per layer			" + _nodeCount / _nodeLayerCount);
+		EditorGUILayout.LabelField("Nodes per layer" , label2: "" + _nodeCount / _nodeLayerCount);
 
 		EditorGUILayout.BeginHorizontal();
 		EditorGUILayout.PrefixLabel("Node Layer Height");
-		_layerHeight = EditorGUILayout.Slider(_layerHeight, 0.1f, 100f);
+		_layerHeight = EditorGUILayout.Slider(_layerHeight, 0.1f, 10f);
 		EditorGUILayout.EndHorizontal();
 
 		EditorGUILayout.BeginHorizontal();
@@ -72,7 +72,7 @@ public class NodeWindow : EditorWindow {
 			for (int i = 0; i < _nodes.Count; i++) {
 				if (_nodes[i].transform.position.magnitude <= 100f)
 					creationZeroY = new Vector3(_nodeCreationPos[i].x, 0, _nodeCreationPos[i].z);
-					_nodes[i].transform.position = (creationZeroY * _radius) + (Vector3.up * _layerHeight * _nodeCreationPos[i].y);
+					_nodes[i].transform.position = (creationZeroY * _radius) + (Vector3.up * _layerHeight * _nodeCreationPos[i].y) + _lastSpawnedNodeHolder.transform.position;
 			}
 		}
 	}
