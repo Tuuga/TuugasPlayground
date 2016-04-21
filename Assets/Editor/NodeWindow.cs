@@ -7,6 +7,9 @@ public class NodeWindow : EditorWindow {
 
 	public GameObject nodeHolder;
 	public GameObject node;
+	public GameObject line;
+	GameObject lineIns;
+	LineRenderer _lr;
 	GameObject _lastSpawnedNodeHolder;
 	List<GameObject> _nodes;
 	List<Vector3> _nodeCreationPos;
@@ -64,13 +67,23 @@ public class NodeWindow : EditorWindow {
 				}
 			}
 		}
+
+		if (GUILayout.Button("Draw Line")) {
+			if (lineIns == null)
+				lineIns = Instantiate(line);
+			_lr = lineIns.GetComponent<LineRenderer>();
+			_lr.SetVertexCount(_nodes.Count);
+			for (int i = 0; i < _nodes.Count; i++) {
+				_lr.SetPosition(i, _nodes[i].transform.position);
+			}
+		}
 	}
 
 	void Update () {
 		if (_nodes != null && _lastSpawnedNodeHolder != null && _radius >= 0.1f) {
 			Vector3 creationZeroY = Vector3.zero;
 			for (int i = 0; i < _nodes.Count; i++) {
-				if (_nodes[i].transform.position.magnitude <= 100f)
+				if (_nodes[i].transform.position.magnitude <= 101f)
 					creationZeroY = new Vector3(_nodeCreationPos[i].x, 0, _nodeCreationPos[i].z);
 					_nodes[i].transform.position = (creationZeroY * _radius) + (Vector3.up * _layerHeight * _nodeCreationPos[i].y) + _lastSpawnedNodeHolder.transform.position;
 			}
