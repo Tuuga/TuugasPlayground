@@ -58,17 +58,11 @@ public class NodeWindow : EditorWindow {
 			_selectedNodeStartPos = _nodeHolderScript.GetStartPos();
 			_nodeHolderScript.SetShape(_nodeShape);
 
-			if (_nodeHolderScript.GetShape() == NodeShape.NodeArrayShape.Cylinder) {
-				CylinderModify();
-			} else if (_nodeHolderScript.GetShape() == NodeShape.NodeArrayShape.Cube) {
-				CubeModify();
-			} else if (_nodeHolderScript.GetShape() == NodeShape.NodeArrayShape.Sphere) {
-				SphereModify();
-			}
+			ModifySelected();
 		}		
 	}
 
-	void CylinderModify () {
+	void ModifySelected () {
 		if (_selectedNodes != null && _selected != null && _radius >= 0.1f) {
 			Vector3 creationZeroY = Vector3.zero;
 			for (int i = 0; i < _selectedNodes.Count; i++) {
@@ -76,14 +70,6 @@ public class NodeWindow : EditorWindow {
 				_selectedNodes[i].transform.position = (creationZeroY * _radius) + (Vector3.up * _layerHeight * _selectedNodeStartPos[i].y) + _selected.transform.position;
 			}
 		}
-	}
-
-	void CubeModify () {
-
-	}
-
-	void SphereModify () {
-
 	}
 
 	void SpawnNodesButton () {
@@ -118,18 +104,33 @@ public class NodeWindow : EditorWindow {
 
 	void SpawnCylinderNodeArray (Transform nodeHolderTransform, ref List<GameObject> createdNodes, ref List<Vector3> createdNodesPos) {
 		
-		for (int j = 0; j < _nodeLayerCount; j++) {
-			for (int i = 0; i < _nodeCount / _nodeLayerCount; i++) {
-				Vector3 nodePos = Vector3.forward + (Vector3.up * j);
-				if (i > 0)
-					nodePos = Quaternion.AngleAxis(360f / (_nodeCount / _nodeLayerCount) * i, Vector3.up) * nodePos;
+		for (int i = 0; i < _nodeLayerCount; i++) {
+			for (int j = 0; j < _nodeCount / _nodeLayerCount; j++) {
+				Vector3 nodePos = Vector3.forward + (Vector3.up * i);
+				if (j > 0)
+					nodePos = Quaternion.AngleAxis(360f / (_nodeCount / _nodeLayerCount) * j, Vector3.up) * nodePos;
 				InitializeNode(nodePos, nodeHolderTransform, ref createdNodes, ref createdNodesPos);
 			}
 		}
 	}
 
+	// Kinda working
 	void SpawnCubeNodeArray (Transform nodeHolderTransform, ref List<GameObject> createdNodes, ref List<Vector3> createdNodesPos) {
+		for (int y = -_nodeLayerCount / 2; y <= _nodeLayerCount / 2; y++) {
+			for (int x = -(_nodeCount / _nodeLayerCount) / 2; x <= _nodeCount / _nodeLayerCount / 2; x++) {
+				for (int z = -(_nodeCount / _nodeLayerCount) / 2; z <= _nodeCount / _nodeLayerCount / 2; z++) {
+					Vector3 nodePos = new Vector3();
+					nodePos = new Vector3(_radius * x, _layerHeight * y, _radius * z);
 
+					// This mess needs cleaning up
+					if (y == -_nodeLayerCount / 2 || y == _nodeLayerCount / 2 ||
+						z == _nodeCount / _nodeLayerCount / 2 || x == _nodeCount / _nodeLayerCount / 2 || 
+						z == -(_nodeCount / _nodeLayerCount) / 2 || x == -(_nodeCount / _nodeLayerCount) / 2) {
+						InitializeNode(nodePos, nodeHolderTransform, ref createdNodes, ref createdNodesPos);
+					}
+				}		
+			}
+		}
 	}
 
 	void SpawnSphereNodeArray (Transform nodeHolderTransform, ref List<GameObject> createdNodes, ref List<Vector3> createdNodesPos) {
