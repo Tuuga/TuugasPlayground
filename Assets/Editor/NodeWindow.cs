@@ -5,6 +5,8 @@ using System.Collections.Generic;
 [ExecuteInEditMode]
 public class NodeWindow : EditorWindow {
 
+	NodeShape.NodeArrayShape _nodeShape;
+
 	public GameObject nodeHolder;
 	public GameObject node;
 	public GameObject line;
@@ -28,6 +30,8 @@ public class NodeWindow : EditorWindow {
 	}
 
 	void OnGUI () {
+
+		CreateShapeSelector("Node Array Shape", ref _nodeShape);
 		CreateSlider("Node Count", ref _nodeCount, 2, 10000);
 		CreateSlider("Node Layer Count", ref _nodeLayerCount, 1, _nodeCount / 2);
 		EditorGUILayout.LabelField("Nodes per layer" , label2: "" + _nodeCount / _nodeLayerCount);
@@ -52,8 +56,19 @@ public class NodeWindow : EditorWindow {
 			_nodeHolderScript = _selected.GetComponent<NodeHolder>();
 			_selectedNodes = _nodeHolderScript.GetNodes();
 			_selectedNodeStartPos = _nodeHolderScript.GetStartPos();
-		}
+			_nodeHolderScript.SetShape(_nodeShape);
 
+			if (_nodeHolderScript.GetShape() == NodeShape.NodeArrayShape.Cylinder) {
+				CylinderModify();
+			} else if (_nodeHolderScript.GetShape() == NodeShape.NodeArrayShape.Cube) {
+				CubeModify();
+			} else if (_nodeHolderScript.GetShape() == NodeShape.NodeArrayShape.Sphere) {
+				SphereModify();
+			}
+		}		
+	}
+
+	void CylinderModify () {
 		if (_selectedNodes != null && _selected != null && _radius >= 0.1f) {
 			Vector3 creationZeroY = Vector3.zero;
 			for (int i = 0; i < _selectedNodes.Count; i++) {
@@ -63,25 +78,12 @@ public class NodeWindow : EditorWindow {
 		}
 	}
 
-	void CreateSlider (string prefix, ref int value, int min, int max) {
-		EditorGUILayout.BeginHorizontal();
-		EditorGUILayout.PrefixLabel(prefix);
-		value = EditorGUILayout.IntSlider(value, min, max);
-		EditorGUILayout.EndHorizontal();
+	void CubeModify () {
+
 	}
 
-	void CreateSlider (string prefix, ref float value, float min, float max) {
-		EditorGUILayout.BeginHorizontal();
-		EditorGUILayout.PrefixLabel(prefix);
-		value = EditorGUILayout.Slider(value, min, max);
-		EditorGUILayout.EndHorizontal();
-	}
+	void SphereModify () {
 
-	void CreateToggle (string prefix, ref bool value) {
-		EditorGUILayout.BeginHorizontal();
-		EditorGUILayout.PrefixLabel(prefix);
-		value = EditorGUILayout.Toggle(value);
-		EditorGUILayout.EndHorizontal();
 	}
 
 	void SpawnNodesButton () {
@@ -93,20 +95,45 @@ public class NodeWindow : EditorWindow {
 			List<GameObject> createdNodes = new List<GameObject>();
 			List<Vector3> createdNodesPos = new List<Vector3>();
 
-			for (int j = 0; j < _nodeLayerCount; j++) {
-				for (int i = 0; i < _nodeCount / _nodeLayerCount; i++) {
-					Vector3 nodePos = Vector3.forward + (Vector3.up * j);
-					if (i > 0)
-						nodePos = Quaternion.AngleAxis(360f / (_nodeCount / _nodeLayerCount) * i, Vector3.up) * nodePos;
-					GameObject nodeIns = (GameObject)Instantiate(node, nodePos, Quaternion.identity);
-					nodeIns.name = "Node";
-					nodeIns.transform.parent = _nodeHolderIns.transform;
-					createdNodes.Add(nodeIns);
-					createdNodesPos.Add(nodeIns.transform.position);
-				}
+			if (_nodeShape == NodeShape.NodeArrayShape.Cylinder) {
+				SpawnCylinderNodeArray(_nodeHolderIns.transform, ref createdNodes, ref createdNodesPos);
+			} else if (_nodeShape == NodeShape.NodeArrayShape.Cube) {
+				SpawnCubeNodeArray(_nodeHolderIns.transform, ref createdNodes, ref createdNodesPos);
+			} else if (_nodeShape == NodeShape.NodeArrayShape.Sphere) {
+				SpawnSphereNodeArray(_nodeHolderIns.transform, ref createdNodes, ref createdNodesPos);
 			}
+
 			_nodeHolderScript.SetNodes(createdNodes, createdNodesPos);
+			_nodeHolderScript.SetShape(_nodeShape);
 		}
+	}
+
+	void InitializeNode (Vector3 nodePos , Transform nodeHolderTransform, ref List<GameObject> createdNodes, ref List<Vector3> createdNodesPos) {
+		GameObject nodeIns = (GameObject)Instantiate(node, nodePos, Quaternion.identity);
+		nodeIns.name = "Node";
+		nodeIns.transform.parent = nodeHolderTransform;
+		createdNodes.Add(nodeIns);
+		createdNodesPos.Add(nodeIns.transform.position);
+	}
+
+	void SpawnCylinderNodeArray (Transform nodeHolderTransform, ref List<GameObject> createdNodes, ref List<Vector3> createdNodesPos) {
+		
+		for (int j = 0; j < _nodeLayerCount; j++) {
+			for (int i = 0; i < _nodeCount / _nodeLayerCount; i++) {
+				Vector3 nodePos = Vector3.forward + (Vector3.up * j);
+				if (i > 0)
+					nodePos = Quaternion.AngleAxis(360f / (_nodeCount / _nodeLayerCount) * i, Vector3.up) * nodePos;
+				InitializeNode(nodePos, nodeHolderTransform, ref createdNodes, ref createdNodesPos);
+			}
+		}
+	}
+
+	void SpawnCubeNodeArray (Transform nodeHolderTransform, ref List<GameObject> createdNodes, ref List<Vector3> createdNodesPos) {
+
+	}
+
+	void SpawnSphereNodeArray (Transform nodeHolderTransform, ref List<GameObject> createdNodes, ref List<Vector3> createdNodesPos) {
+
 	}
 
 	void DrawLine () {
@@ -149,5 +176,33 @@ public class NodeWindow : EditorWindow {
 				}
 			}
 		}
+	}
+
+	void CreateSlider (string prefix, ref int value, int min, int max) {
+		EditorGUILayout.BeginHorizontal();
+		EditorGUILayout.PrefixLabel(prefix);
+		value = EditorGUILayout.IntSlider(value, min, max);
+		EditorGUILayout.EndHorizontal();
+	}
+
+	void CreateSlider (string prefix, ref float value, float min, float max) {
+		EditorGUILayout.BeginHorizontal();
+		EditorGUILayout.PrefixLabel(prefix);
+		value = EditorGUILayout.Slider(value, min, max);
+		EditorGUILayout.EndHorizontal();
+	}
+
+	void CreateToggle (string prefix, ref bool value) {
+		EditorGUILayout.BeginHorizontal();
+		EditorGUILayout.PrefixLabel(prefix);
+		value = EditorGUILayout.Toggle(value);
+		EditorGUILayout.EndHorizontal();
+	}
+
+	void CreateShapeSelector (string prefix, ref NodeShape.NodeArrayShape value) {
+		EditorGUILayout.BeginHorizontal();
+		EditorGUILayout.PrefixLabel(prefix);
+		value = (NodeShape.NodeArrayShape)EditorGUILayout.EnumPopup(_nodeShape);
+		EditorGUILayout.EndHorizontal();
 	}
 }
