@@ -25,29 +25,42 @@ public class NodeWindow : EditorWindow {
 	}
 
 	void OnGUI () {
-
-		EditorGUILayout.BeginHorizontal();
-		EditorGUILayout.PrefixLabel("Node Count");
-		_nodeCount = EditorGUILayout.IntSlider(_nodeCount, 2, 10000);
-		EditorGUILayout.EndHorizontal();
-
-		EditorGUILayout.BeginHorizontal();
-		EditorGUILayout.PrefixLabel("Node Layer Count");
-		_nodeLayerCount = EditorGUILayout.IntSlider(_nodeLayerCount, 1, _nodeCount / 2);
-		EditorGUILayout.EndHorizontal();
-
+		CreateSlider("Node Count", ref _nodeCount, 2, 10000);
+		CreateSlider("Node Layer Count", ref _nodeLayerCount, 1, _nodeCount / 2);
 		EditorGUILayout.LabelField("Nodes per layer" , label2: "" + _nodeCount / _nodeLayerCount);
+		CreateSlider("Node Layer Height", ref _layerHeight, 0.1f, 10f);
+		CreateSlider("Node Radius", ref _radius, 0.1f, 100f);
 
+		SpawnNodesButton();
+		DrawLineButton();
+		
+	}
+
+	void Update () {
+		if (_nodes != null && _lastSpawnedNodeHolder != null && _radius >= 0.1f) {
+			Vector3 creationZeroY = Vector3.zero;
+			for (int i = 0; i < _nodes.Count; i++) {
+				creationZeroY = new Vector3(_nodeCreationPos[i].x, 0, _nodeCreationPos[i].z);
+				_nodes[i].transform.position = (creationZeroY * _radius) + (Vector3.up * _layerHeight * _nodeCreationPos[i].y) + _lastSpawnedNodeHolder.transform.position;
+			}
+		}
+	}
+
+	void CreateSlider (string prefix, ref int value, int min, int max) {
 		EditorGUILayout.BeginHorizontal();
-		EditorGUILayout.PrefixLabel("Node Layer Height");
-		_layerHeight = EditorGUILayout.Slider(_layerHeight, 0.1f, 10f);
+		EditorGUILayout.PrefixLabel(prefix);
+		value = EditorGUILayout.IntSlider(value, min, max);
 		EditorGUILayout.EndHorizontal();
+	}
 
+	void CreateSlider (string prefix, ref float value, float min, float max) {
 		EditorGUILayout.BeginHorizontal();
-		EditorGUILayout.PrefixLabel("Node Radius");
-		_radius = EditorGUILayout.Slider(_radius, 0.1f, 100f);
+		EditorGUILayout.PrefixLabel(prefix);
+		value = EditorGUILayout.Slider(value, min, max);
 		EditorGUILayout.EndHorizontal();
+	}
 
+	void SpawnNodesButton () {
 		if (GUILayout.Button("Spawn Nodes")) {
 			_lastSpawnedNodeHolder = (GameObject)Instantiate(nodeHolder, Vector3.zero, Quaternion.identity);
 			_lastSpawnedNodeHolder.name = "NodeHolder";
@@ -67,7 +80,9 @@ public class NodeWindow : EditorWindow {
 				}
 			}
 		}
+	}
 
+	void DrawLineButton () {
 		if (GUILayout.Button("Draw Line")) {
 			if (lineIns == null)
 				lineIns = Instantiate(line);
@@ -75,17 +90,6 @@ public class NodeWindow : EditorWindow {
 			_lr.SetVertexCount(_nodes.Count);
 			for (int i = 0; i < _nodes.Count; i++) {
 				_lr.SetPosition(i, _nodes[i].transform.position);
-			}
-		}
-	}
-
-	void Update () {
-		if (_nodes != null && _lastSpawnedNodeHolder != null && _radius >= 0.1f) {
-			Vector3 creationZeroY = Vector3.zero;
-			for (int i = 0; i < _nodes.Count; i++) {
-				if (_nodes[i].transform.position.magnitude <= 101f)
-					creationZeroY = new Vector3(_nodeCreationPos[i].x, 0, _nodeCreationPos[i].z);
-					_nodes[i].transform.position = (creationZeroY * _radius) + (Vector3.up * _layerHeight * _nodeCreationPos[i].y) + _lastSpawnedNodeHolder.transform.position;
 			}
 		}
 	}
