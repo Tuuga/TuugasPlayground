@@ -8,25 +8,29 @@ public class AllLetterInput : MonoBehaviour {
 	public Text scoreText;
 	public Text mistakeText;
 
+	//public List<Transform> enemies;
+	//public GameObject player;
 	public List<Transform> nodes;
-	public List<Transform> enemies;
-
-	public GameObject player;
-
-	List<int> enemyIndexes;
+	public List<Color> keysToHitColors;
+	public Color lastHitKeyColor;
+	Color normalKeyColor;
+	List<int> keysToHit;
 
 	int score;
 	int mistakes;
-	int playerPosIndex;
+	int lastKeyHit;
 
 	void Start () {
-		print("asd");
-		enemyIndexes = new List<int>();
-		for (int i = 0; i < enemies.Count; i++) {
-			enemyIndexes.Add(i);
-			print(enemyIndexes[i]);
-			enemies[i].position = nodes[enemyIndexes[i]].position;
+
+		normalKeyColor = nodes[0].Find("Key Background").GetComponent<Image>().color;
+
+		keysToHit = new List<int>();
+		for (int i = 0; i < keysToHitColors.Count; i++) {
+			keysToHit.Add(i);
+			
 		}
+		UpdateKeysToHit();
+		//UpdateKeyColors();
 	}
 
 	void Update () {
@@ -37,136 +41,175 @@ public class AllLetterInput : MonoBehaviour {
 		scoreText.text = "Score: " + score;
 		mistakeText.text = "Mistakes: " + mistakes;
 	}
+	void KeyHit (int i) {
+		//player.transform.position = nodes[i].position;
 
-	void MoveToNode (int i) {
-		player.transform.position = nodes[i].position;
-		playerPosIndex = i;
+		lastKeyHit = i;
 
-		if (playerPosIndex == enemyIndexes[0]) {
-			MoveEnemy();
+		if (lastKeyHit == keysToHit[0]) {
+			//MoveEnemy();
+			UpdateKeysToHit();
 			score++;
 		} else {
 			mistakes++;
 		}
 		UpdateText();
+		UpdateKeyColors();
 	}
 
-	void MoveEnemy () {
+	void UpdateKeyColors () {
 
-		for (int i = enemyIndexes.Count - 1; i > 0; i--) {
-			enemyIndexes[i] = enemyIndexes[i - 1];
-			enemies[i].position = nodes[enemyIndexes[i]].position;
+		for (int i = 0; i < keysToHit.Count; i++) {
+			nodes[keysToHit[i]].Find("Key Background").GetComponent<Image>().color = keysToHitColors[i];
 		}
 
-		int lastIndex = enemyIndexes[0];
-		enemyIndexes[0] = Random.Range(0, nodes.Count);
+		for (int i = 0; i < nodes.Count; i++) {
+			if (i == lastKeyHit) {
+				nodes[i].Find("Key Background").GetComponent<Image>().color = lastHitKeyColor;
+			} else if (!keysToHit.Contains(i)) {
+				nodes[i].Find("Key Background").GetComponent<Image>().color = normalKeyColor;
+			}
+		}		
+	}
+
+	void UpdateKeysToHit () {
+
+		for (int i = 0; i < keysToHit.Count - 1; i++) {
+			keysToHit[i] = keysToHit[i + 1];
+			nodes[keysToHit[i]].Find("Key Background").GetComponent<Image>().color = keysToHitColors[i];
+		}
+
+		int nextRandom = Random.Range(0, nodes.Count);
+		while (keysToHit.Contains(nextRandom) || nextRandom == lastKeyHit) {
+			nextRandom = Random.Range(0, nodes.Count);
+		}
+
+		keysToHit[keysToHit.Count - 1] = nextRandom;
+		nodes[keysToHit[keysToHit.Count - 1]].Find("Key Background").GetComponent<Image>().color = keysToHitColors[keysToHit.Count - 1];
+
+		/*
+		for (int i = keysToHit.Count - 1; i > 0; i--) {
+			print(i);
+			keysToHit[i] = keysToHit[i - 1];
+			nodes[keysToHit[i]].Find("Key Background").GetComponent<Image>().color = keysToHitColors[i];
+		}
+		*/
+	}
+
+	/*
+	void MoveEnemy () {
+
+		for (int i = keysToHit.Count - 1; i > 0; i--) {
+			keysToHit[i] = keysToHit[i - 1];
+			enemies[i].position = nodes[keysToHit[i]].position;
+		}
+
+		int lastIndex = keysToHit[0];
+		keysToHit[0] = Random.Range(0, nodes.Count);
 		// "<" button not working
-		while (enemyIndexes[0] == lastIndex || enemyIndexes[0] == 19 || CheckAllIndexes(enemyIndexes[0])) {
-			enemyIndexes[0] = Random.Range(0, nodes.Count);
-			enemies[0].position = nodes[enemyIndexes[0]].position;
+		while (keysToHit[0] == lastIndex || CheckAllIndexes(keysToHit[0])) {
+			keysToHit[0] = Random.Range(0, nodes.Count);
+			enemies[0].position = nodes[keysToHit[0]].position;
 		}
 	}
 
 	bool CheckAllIndexes (int value) {
-		for (int i = 1; i < enemyIndexes.Count; i++) {
-			if (value == enemyIndexes[i]) {
+		for (int i = 1; i < keysToHit.Count; i++) {
+			if (value == keysToHit[i]) {
 				return true;
 			}
 		}
 		return false;
 	}
-
+	*/
 	void AllInputs () {
 
 		if (Input.GetKeyDown(KeyCode.Q)) {
-			MoveToNode(0);
+			KeyHit(0);
 		}
 		if (Input.GetKeyDown(KeyCode.W)) {
-			MoveToNode(1);
+			KeyHit(1);
 		}
 		if (Input.GetKeyDown(KeyCode.E)) {
-			MoveToNode(2);
+			KeyHit(2);
 		}
 		if (Input.GetKeyDown(KeyCode.R)) {
-			MoveToNode(3);
+			KeyHit(3);
 		}
 		if (Input.GetKeyDown(KeyCode.T)) {
-			MoveToNode(4);
+			KeyHit(4);
 		}
 		if (Input.GetKeyDown(KeyCode.Y)) {
-			MoveToNode(5);
+			KeyHit(5);
 		}
 		if (Input.GetKeyDown(KeyCode.U)) {
-			MoveToNode(6);
+			KeyHit(6);
 		}
 		if (Input.GetKeyDown(KeyCode.I)) {
-			MoveToNode(7);
+			KeyHit(7);
 		}
 		if (Input.GetKeyDown(KeyCode.O)) {
-			MoveToNode(8);
+			KeyHit(8);
 		}
 		if (Input.GetKeyDown(KeyCode.P)) {
-			MoveToNode(9);
+			KeyHit(9);
 		}
 		if (Input.GetKeyDown(KeyCode.A)) {
-			MoveToNode(10);
+			KeyHit(10);
 		}
 		if (Input.GetKeyDown(KeyCode.S)) {
-			MoveToNode(11);
+			KeyHit(11);
 		}
 		if (Input.GetKeyDown(KeyCode.D)) {
-			MoveToNode(12);
+			KeyHit(12);
 		}
 		if (Input.GetKeyDown(KeyCode.F)) {
-			MoveToNode(13);
+			KeyHit(13);
 		}
 		if (Input.GetKeyDown(KeyCode.G)) {
-			MoveToNode(14);
+			KeyHit(14);
 		}
 		if (Input.GetKeyDown(KeyCode.H)) {
-			MoveToNode(15);
+			KeyHit(15);
 		}
 		if (Input.GetKeyDown(KeyCode.J)) {
-			MoveToNode(16);
+			KeyHit(16);
 		}
 		if (Input.GetKeyDown(KeyCode.K)) {
-			MoveToNode(17);
+			KeyHit(17);
 		}
 		if (Input.GetKeyDown(KeyCode.L)) {
-			MoveToNode(18);
-		}
-		if (Input.GetKeyDown(KeyCode.Less)) {
-			MoveToNode(19);
+			KeyHit(18);
 		}
 		if (Input.GetKeyDown(KeyCode.Z)) {
-			MoveToNode(20);
+			KeyHit(19);
 		}
 		if (Input.GetKeyDown(KeyCode.X)) {
-			MoveToNode(21);
+			KeyHit(20);
 		}
 		if (Input.GetKeyDown(KeyCode.C)) {
-			MoveToNode(22);
+			KeyHit(21);
 		}
 		if (Input.GetKeyDown(KeyCode.V)) {
-			MoveToNode(23);
+			KeyHit(22);
 		}
 		if (Input.GetKeyDown(KeyCode.B)) {
-			MoveToNode(24);
+			KeyHit(23);
 		}
 		if (Input.GetKeyDown(KeyCode.N)) {
-			MoveToNode(25);
+			KeyHit(24);
 		}
 		if (Input.GetKeyDown(KeyCode.M)) {
-			MoveToNode(26);
+			KeyHit(25);
 		}
 		if (Input.GetKeyDown(KeyCode.Comma)) {
-			MoveToNode(27);
+			KeyHit(26);
 		}
 		if (Input.GetKeyDown(KeyCode.Period)) {
-			MoveToNode(28);
+			KeyHit(27);
 		}
 		if (Input.GetKeyDown(KeyCode.Minus)) {
-			MoveToNode(29);
+			KeyHit(28);
 		}
 	}
 }
