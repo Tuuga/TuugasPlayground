@@ -5,10 +5,10 @@ using System.Collections.Generic;
 
 public struct Key {
 	public Image visual;
-	string keyString;
-	int index;
+	public string keyString;
+	public int index;
 
-	public Key(string s, Image im, int i) {
+	public Key (string s, Image im, int i) {
 		visual = im;
 		keyString = s;
 		index = i;
@@ -28,17 +28,18 @@ public class AllLetterInput : MonoBehaviour {
 
 	public string stringToWrite;
 	public string keyboardString = "qwertyuiopasdfghjklzxcvbnm,.-";
-	//public List<Transform> nodes;
 	public List<Color> keysToHitColors;
 	public Color lastHitKeyColor;
 	Color normalKeyColor;
-	public List<int> keysToHit;
+	List<int> keysToHit = new List<int>();
 
 	int score;
 	int mistakes;
 	int lastKeyHit;
 
 	List<Key> keys = new List<Key>();
+	// For edge cases like "space"
+	Dictionary<string, Key> keysDict = new Dictionary<string, Key>();
 
 	void InitialKeys () {
 		for (int i = 0; i < keyboardString.Length; i++) {
@@ -48,6 +49,10 @@ public class AllLetterInput : MonoBehaviour {
 		}
 		Image spaceVisual = GameObject.Find("space").transform.Find("Key Background").GetComponent<Image>();
 		keys.Add(new Key("space", spaceVisual, keys.Count));
+
+		for (int i = 0; i < keys.Count; i++) {
+			keysDict.Add(keys[i].keyString, keys[i]);
+		}
 	}
 
 	void Start () {
@@ -63,7 +68,7 @@ public class AllLetterInput : MonoBehaviour {
 					keysToHit.Add(j);
 					j = keys.Count;
 				} else if (stringToWrite[i].ToString() == " ") {
-					keysToHit.Add(keys.Count - 1);
+					keysToHit.Add(keysDict["space"].index);
 					j = keys.Count;
 				}
 			}

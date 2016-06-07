@@ -457,12 +457,11 @@ MonoBehaviour:
   scoreText: {fileID: 2130828944}
   mistakeText: {fileID: 1357218540}
   toWriteText: {fileID: 1651937372}
-  stringToWrite: testing space
+  stringToWrite: joku random stringi missa on spaceja
   keyboardString: qwertyuiopasdfghjklzxcvbnm,.-
   keysToHitColors:
   - {r: 1, g: 0, b: 0, a: 1}
   lastHitKeyColor: {r: 0, g: 1, b: 0, a: 1}
-  keysToHit: 
 --- !u!4 &94902462
 Transform:
   m_ObjectHideFlags: 0
