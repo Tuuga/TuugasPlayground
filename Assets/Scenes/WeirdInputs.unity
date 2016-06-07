@@ -457,38 +457,8 @@ MonoBehaviour:
   scoreText: {fileID: 2130828944}
   mistakeText: {fileID: 1357218540}
   toWriteText: {fileID: 1651937372}
-  stringToWrite: testingspace
+  stringToWrite: testing space
   keyboardString: qwertyuiopasdfghjklzxcvbnm,.-
-  nodes:
-  - {fileID: 1929564880}
-  - {fileID: 1461562605}
-  - {fileID: 57806797}
-  - {fileID: 2110384667}
-  - {fileID: 956544784}
-  - {fileID: 1031612631}
-  - {fileID: 129969985}
-  - {fileID: 711838834}
-  - {fileID: 1928254085}
-  - {fileID: 503619471}
-  - {fileID: 2059686884}
-  - {fileID: 1514592259}
-  - {fileID: 1328228781}
-  - {fileID: 1064937314}
-  - {fileID: 938670604}
-  - {fileID: 1136314460}
-  - {fileID: 62813082}
-  - {fileID: 566573261}
-  - {fileID: 474811938}
-  - {fileID: 1890213484}
-  - {fileID: 204873829}
-  - {fileID: 458376594}
-  - {fileID: 1654713023}
-  - {fileID: 1033383703}
-  - {fileID: 1297831195}
-  - {fileID: 277688532}
-  - {fileID: 768492847}
-  - {fileID: 1408530664}
-  - {fileID: 804150437}
   keysToHitColors:
   - {r: 1, g: 0, b: 0, a: 1}
   lastHitKeyColor: {r: 0, g: 1, b: 0, a: 1}
@@ -1865,7 +1835,7 @@ GameObject:
   m_Component:
   - 224: {fileID: 638033035}
   m_Layer: 5
-  m_Name: Space
+  m_Name: space
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2116,7 +2086,7 @@ GameObject:
   m_Component:
   - 224: {fileID: 768492847}
   m_Layer: 5
-  m_Name: ;
+  m_Name: ','
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3310,7 +3280,7 @@ GameObject:
   m_Component:
   - 224: {fileID: 1408530664}
   m_Layer: 5
-  m_Name: ':'
+  m_Name: .
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

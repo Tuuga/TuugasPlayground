@@ -3,6 +3,23 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
+public struct Key {
+	public Image visual;
+	string keyString;
+	int index;
+
+	public Key(string s, Image im, int i) {
+		visual = im;
+		keyString = s;
+		index = i;
+	}
+	public bool KeyInput () {
+		if (Input.GetKeyDown(keyString))
+			return true;
+		return false;
+	}
+};
+
 public class AllLetterInput : MonoBehaviour {
 
 	public Text scoreText;
@@ -11,7 +28,7 @@ public class AllLetterInput : MonoBehaviour {
 
 	public string stringToWrite;
 	public string keyboardString = "qwertyuiopasdfghjklzxcvbnm,.-";
-	public List<Transform> nodes;
+	//public List<Transform> nodes;
 	public List<Color> keysToHitColors;
 	public Color lastHitKeyColor;
 	Color normalKeyColor;
@@ -21,24 +38,37 @@ public class AllLetterInput : MonoBehaviour {
 	int mistakes;
 	int lastKeyHit;
 
+	List<Key> keys = new List<Key>();
+
+	void InitialKeys () {
+		for (int i = 0; i < keyboardString.Length; i++) {
+			Image newVisual = GameObject.Find(keyboardString[i].ToString().ToUpper()).transform.Find("Key Background").GetComponent<Image>();
+			Key newKey = new Key(keyboardString[i].ToString(), newVisual, i);
+			keys.Add(newKey);
+		}
+		Image spaceVisual = GameObject.Find("space").transform.Find("Key Background").GetComponent<Image>();
+		keys.Add(new Key("space", spaceVisual, keys.Count));
+	}
+
 	void Start () {
 
-		normalKeyColor = nodes[0].Find("Key Background").GetComponent<Image>().color;
+		InitialKeys();
+
+		normalKeyColor = keys[0].visual.color;
 
 		keysToHit = new List<int>();
 		for (int i = 0; i < stringToWrite.Length; i++) {
-			for (int j = 0; j < keyboardString.Length; j++) {
+			for (int j = 0; j < keys.Count; j++) {
 				if (stringToWrite[i] == keyboardString[j]) {
 					keysToHit.Add(j);
-					j = keyboardString.Length;
+					j = keys.Count;
+				} else if (stringToWrite[i].ToString() == " ") {
+					keysToHit.Add(keys.Count - 1);
+					j = keys.Count;
 				}
 			}
 		}
 
-		
-		for (int i = 0; i < keysToHitColors.Count; i++) {
-			keysToHit.Add(i);
-		}
 		UpdateKeyColors();
 		UpdateText();
 	}
@@ -67,15 +97,15 @@ public class AllLetterInput : MonoBehaviour {
 
 	void UpdateKeyColors () {
 
-		for (int i = 0; i < nodes.Count; i++) {
-			nodes[i].Find("Key Background").GetComponent<Image>().color = normalKeyColor;
+		for (int i = 0; i < keys.Count; i++) {
+			keys[i].visual.color = normalKeyColor;
 			if (i == lastKeyHit) {
-				nodes[i].Find("Key Background").GetComponent<Image>().color = lastHitKeyColor;
+				keys[i].visual.color = lastHitKeyColor;
 			}
 		}
 
 		for (int i = 0; i < keysToHitColors.Count; i++) {
-			nodes[keysToHit[i]].Find("Key Background").GetComponent<Image>().color = keysToHitColors[i];
+			keys[keysToHit[i]].visual.color = keysToHitColors[i];
 		}
 	}
 
@@ -86,24 +116,12 @@ public class AllLetterInput : MonoBehaviour {
 		for (int i = 0; i < keysToHitColors.Count - 1; i++) {
 			keysToHit[i] = keysToHit[i + 1];
 		}
-
-		/*
-		int nextRandom = Random.Range(0, nodes.Count);
-		while (keysToHit.Contains(nextRandom) || nextRandom == lastKeyHit) {
-			nextRandom = Random.Range(0, nodes.Count);
-		}
-		keysToHit[keysToHit.Count - 1] = nextRandom;
-		*/
 	}
 
 	void AllInputs () {
 		// Condensed input code
-		for (int i = 0; i < keyboardString.Length; i++)
-			if (Input.GetKeyDown(keyboardString[i].ToString()))
+		for (int i = 0; i < keys.Count; i++)
+			if (keys[i].KeyInput())
 				KeyHit(i);
-
-		if (Input.GetKeyDown(KeyCode.Space)) {
-			KeyHit(29);
-		}
 	}
 }
