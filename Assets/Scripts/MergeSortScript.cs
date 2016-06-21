@@ -70,7 +70,6 @@ public class MergeSortScript : MonoBehaviour {
 			c.Add(b[0]);
 			b.Remove(b[0]);
 		}
-
 		return c;
 	}
 
