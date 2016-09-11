@@ -8,6 +8,8 @@ TagManager:
   - Waypoint
   - SnakeNode
   - KeyText
+  - Weapon
+  - Enemy
   layers:
   - Default
   - TransparentFX
