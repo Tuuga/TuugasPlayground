@@ -10,6 +10,7 @@ public class PlayerController: MonoBehaviour {
 	public float sprintInterval;
 	public float mouseSens;
 	public float upDownRange;
+	public bool useCam;
 
 	float verticalRotation;
 	float horizontalRotation;
@@ -40,6 +41,8 @@ public class PlayerController: MonoBehaviour {
 
 		if (Input.GetKeyDown(KeyCode.LeftAlt))
 			MouseLock();
+
+		Debug.DrawRay(transform.position, transform.forward, Color.red);
 	}
 
 	void MouseLook () {
@@ -49,7 +52,8 @@ public class PlayerController: MonoBehaviour {
 		horizontalRotation += Input.GetAxis("Mouse X") * mouseSens * Time.deltaTime;
 
 		transform.localRotation = Quaternion.Euler(0, horizontalRotation, 0) * baseRotation;
-		mainCam.transform.localRotation = Quaternion.Euler(verticalRotation, horizontalRotation, 0) * baseRotation;
+		if (useCam)
+			mainCam.transform.localRotation = Quaternion.Euler(verticalRotation, horizontalRotation, 0) * baseRotation;
 	}
 
 	void MouseLock () {
@@ -86,8 +90,9 @@ public class PlayerController: MonoBehaviour {
 			playSpeed = sprintInterval;
 			sprinting = true;
 		}
+		if (useCam)
+			mainCam.transform.position = transform.position;
 
-		mainCam.transform.position = transform.position;
 		if (Input.GetButton("Crouch")) {
 			Crouch();
 			playSpeed = walkInterval * (startMovSpeed / crouchSpeed);
@@ -96,7 +101,7 @@ public class PlayerController: MonoBehaviour {
 			Stand();
 		}
 
-		//Sound
+		// <Step sound>
 		stepTimer += Time.deltaTime * moveDir.magnitude;
 		if(stepTimer >= playSpeed) {
 			stepTimer = 0;
@@ -115,7 +120,7 @@ public class PlayerController: MonoBehaviour {
 				}
 			}
 		}
-
+		// </Step sound>
 		transform.position += moveDir * movSpeed * Time.deltaTime;
 		movSpeed = startMovSpeed;
 	}
@@ -124,16 +129,19 @@ public class PlayerController: MonoBehaviour {
 
 	}
 
+	// WIP
 	void Crouch () {
 		movSpeed = crouchSpeed;
 		cc.height = 1;
 		cc.center = new Vector3(0, -1f, 0);
-		mainCam.transform.position = new Vector3(transform.position.x, transform.position.y - 1f, transform.position.z);
+		if (useCam)
+			mainCam.transform.position = new Vector3(transform.position.x, transform.position.y - 1f, transform.position.z);
 	}
-
+	// WIP
 	void Stand () {
 		cc.height = 2;
 		cc.center = new Vector3(0, -0.5f, 0);
-		mainCam.transform.position = transform.position;
+		if (useCam)
+			mainCam.transform.position = transform.position;
 	}
 }

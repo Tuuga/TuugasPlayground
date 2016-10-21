@@ -5,17 +5,16 @@ using System.Collections.Generic;
 public class MyCode : MonoBehaviour {
 
 	public int listCount;
-	List<int> myList = new List<int>();
+	public List<int> myList;
 	
 	void Start () {
-		print("myList = ListTools.Ordered(listCount);");
-		myList = ListTools.Ordered(listCount);
-		ListTools.PrintList(myList);
-		print("myList = ListTools.RandomizeList(myList);");
+		myList = new List<int>(listCount);
 		myList = ListTools.RandomizeList(myList);
-		ListTools.PrintList(myList, "<color=red>");
-		print("myList = Sorting.MergeSort(myList);");
-		myList = Sorting.MergeSort(myList);
-		ListTools.PrintList(myList, "<color=green>");
+	}
+
+	void Update () {
+		if (Input.GetKeyDown(KeyCode.Space)) {
+			myList = Sorting.MergeSort(myList);
+		}
 	}
 }

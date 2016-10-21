@@ -73,7 +73,9 @@ MonoBehaviour:
   enemiesParent: {fileID: 0}
   enemyImage: {fileID: 1000012921704256, guid: 5927a89887c588d4d9575808b2832293, type: 2}
   playerImage: {fileID: 0}
+  player: {fileID: 0}
   zoom: 5
+  zoomSpeed: 0
   fixedMap: 0
 --- !u!114 &114000011639306236
 MonoBehaviour:
