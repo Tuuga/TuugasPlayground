@@ -180,6 +180,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 38839e8f11c07be4d8f38c3f86a1d506, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  visual: {fileID: 1000013613747796, guid: 218a67c448293b44fa0333181d0506ff, type: 2}
+  myList: 
 --- !u!4 &1422304655
 Transform:
   m_ObjectHideFlags: 0
