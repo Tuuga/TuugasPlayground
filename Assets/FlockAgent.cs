@@ -4,32 +4,48 @@ using System.Collections.Generic;
 
 public class FlockAgent : MonoBehaviour {
 
+	public float comeBackDist = 100f;
+
 	public float neigborhoodDist;
 	public float separationDist;
 	public float lerpSpeed;
 	public float movementSpeed;
 
 	[Range(0, 1f)]
-	public float alignmentWeight, cohesionWeight, separationWeight, avoidWeight = 1f;
+	public float alignmentWeight, cohesionWeight, separationWeight, avoidWeight, backToZeroWeight = 1f;
 	
-	[SerializeField]
 	public Vector3 vector;
+	Vector3 newVec;
+
+	List<FlockAgent> agents = new List<FlockAgent>();
+	MeshRenderer mr;
 
 	void Start () {
 		vector = new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), Random.Range(-1f, 1f)).normalized;
+		mr = GetComponentInChildren<MeshRenderer>();
+
+		var startAgents = FindObjectsOfType<FlockAgent>();
+		foreach (FlockAgent fa in startAgents) {
+			var dist = Vector3.Distance(transform.position, fa.transform.position);
+			if (dist < neigborhoodDist) {
+				agents.Add(fa);
+			}
+		}
 	}
 	
 	void Update () {
-		var newVec = Flocking();
+		newVec = Flocking();
 		newVec.Normalize();
 		vector = Vector3.Lerp(vector, newVec, lerpSpeed);
-		transform.LookAt(transform.position + vector);
+
+		var c = new Color(Mathf.Abs(vector.x), Mathf.Abs(vector.y), Mathf.Abs(vector.z));
+		mr.material.color = c;
+
 		transform.position += vector * Time.deltaTime * movementSpeed;
+		transform.LookAt(transform.position + vector);
 	}
 
 	Vector3 Flocking () {
-		var agents = FindObjectsOfType<FlockAgent>();
-		
 
 		Vector3 alignment = new Vector3();
 		Vector3 cohesion = new Vector3();
@@ -70,6 +86,11 @@ public class FlockAgent : MonoBehaviour {
 			}
 		}
 
+		var inv = new Vector3();
+		if (transform.position.magnitude > comeBackDist) {
+			inv = -transform.position.normalized;
+		}
+
 		alignment /= neighborCount;
 		cohesion /= neighborCount;
 		separation /= separationCount;
@@ -84,10 +105,22 @@ public class FlockAgent : MonoBehaviour {
 		cohesion.Normalize();
 		separation.Normalize();
 		avoid.Normalize();
-		Vector3 v = alignment * alignmentWeight + cohesion * cohesionWeight + separation * separationWeight + avoid * avoidWeight;
-
-		//Debug.DrawLine(transform.position, transform.position + v, Color.red);
+		Vector3 v = alignment * alignmentWeight + cohesion * cohesionWeight + separation * separationWeight + avoid * avoidWeight + inv * backToZeroWeight;
 
 		return v.normalized;
+	}
+
+	void OnTriggerEnter (Collider c) {
+		var fa = GetComponent<FlockAgent>();
+		if (fa) {
+			agents.Add(fa);
+		}
+	}
+
+	void OnTriggerExit (Collider c) {
+		var fa = GetComponent<FlockAgent>();
+		if (fa) {
+			agents.Remove(fa);
+		}
 	}
 }
