@@ -139,13 +139,15 @@ MonoBehaviour:
   comeBackDist: 100
   neigborhoodDist: 20
   separationDist: 10
-  lerpSpeed: 0.05
+  lerpSpeed: 0.9
   movementSpeed: 20
   alignmentWeight: 0.77
   cohesionWeight: 0.338
   separationWeight: 0.514
   avoidWeight: 0.176
   backToZeroWeight: 1
+  randomnessWeight: 1
+  randomInterval: 2
   vector: {x: 0, y: 0, z: 0}
 --- !u!135 &135000011552041978
 SphereCollider:

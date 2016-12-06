@@ -12,8 +12,11 @@ public class FlockAgent : MonoBehaviour {
 	public float movementSpeed;
 
 	[Range(0, 1f)]
-	public float alignmentWeight, cohesionWeight, separationWeight, avoidWeight, backToZeroWeight = 1f;
-	
+	public float alignmentWeight, cohesionWeight, separationWeight, avoidWeight, backToZeroWeight, randomnessWeight = 1f;
+
+	public float randomInterval;
+	float randomTimer;
+
 	public Vector3 vector;
 	Vector3 newVec;
 
@@ -21,7 +24,7 @@ public class FlockAgent : MonoBehaviour {
 	MeshRenderer mr;
 
 	void Start () {
-		vector = new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), Random.Range(-1f, 1f)).normalized;
+		vector = Random.onUnitSphere;
 		mr = GetComponentInChildren<MeshRenderer>();
 
 		var startAgents = FindObjectsOfType<FlockAgent>();
@@ -36,7 +39,7 @@ public class FlockAgent : MonoBehaviour {
 	void Update () {
 		newVec = Flocking();
 		newVec.Normalize();
-		vector = Vector3.Lerp(vector, newVec, lerpSpeed);
+		vector = Vector3.Lerp(vector, newVec, lerpSpeed).normalized;
 
 		var c = new Color(Mathf.Abs(vector.x), Mathf.Abs(vector.y), Mathf.Abs(vector.z));
 		mr.material.color = c;
@@ -91,6 +94,14 @@ public class FlockAgent : MonoBehaviour {
 			inv = -transform.position.normalized;
 		}
 
+		// Add randomness
+		var randomVec = new Vector3();
+		randomTimer += Time.deltaTime;
+		if (randomTimer > randomInterval) {
+			randomVec = Random.onUnitSphere;
+			randomTimer -= randomInterval;
+		}
+
 		alignment /= neighborCount;
 		cohesion /= neighborCount;
 		separation /= separationCount;
@@ -105,7 +116,7 @@ public class FlockAgent : MonoBehaviour {
 		cohesion.Normalize();
 		separation.Normalize();
 		avoid.Normalize();
-		Vector3 v = alignment * alignmentWeight + cohesion * cohesionWeight + separation * separationWeight + avoid * avoidWeight + inv * backToZeroWeight;
+		Vector3 v = alignment * alignmentWeight + cohesion * cohesionWeight + separation * separationWeight + avoid * avoidWeight + inv * backToZeroWeight + randomVec * randomnessWeight;
 
 		return v.normalized;
 	}
