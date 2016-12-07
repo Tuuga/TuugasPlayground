@@ -1,17 +1,12 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 public class ExampleCode : MonoBehaviour {
 
+	bool condition;
 
-	public GameObject asd;
-	// Use this for initialization
 	void Start () {
-
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
+		if (condition) {
+			// do something
+		}
 	}
 }
